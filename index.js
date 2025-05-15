@@ -20,3 +20,5 @@ app.use('/country', countryRouter);
 app.listen(PORT, () => {
     console.log(chalk.bold.green(`Server is running on http://localhost:${PORT}`));
 });
+
+export default app;
