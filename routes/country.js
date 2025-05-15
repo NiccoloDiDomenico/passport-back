@@ -1,12 +1,11 @@
 import express from 'express';
-import { readJSON } from '../lib/file.js';
 const router = express.Router();
-const countries = readJSON('./database/countriesData.json');
+import countries from '../database/countriesData.js';
 
 router.get('/', (req, res) => {
     const countriesList = countries.map((c) => {
         const visaRequiredCount = c.passports.reduce((acc, curr) => {
-            if(curr.isVisaRequired){
+            if (curr.isVisaRequired) {
                 acc++;
             }
             return acc;
@@ -16,7 +15,7 @@ router.get('/', (req, res) => {
             slug: c.slug,
             visaRequired: visaRequiredCount,
             totalPassports: c.passports.length + 1,
-            visaNotRequired: c.passports.length - visaRequiredCount + 1, 
+            visaNotRequired: c.passports.length - visaRequiredCount + 1,
         }
     })
     res.send(countriesList.sort((a, b) => a.slug.localeCompare(b.slug)));
@@ -25,7 +24,7 @@ router.get('/', (req, res) => {
 router.get('/:countrySlug', (req, res) => {
     const { countrySlug } = req.params;
     const countryData = countries.find(p => p.slug === countrySlug);
-    if(!countryData){
+    if (!countryData) {
         return res.status(404).send({ error: 'Country not found' });
     }
     res.send(countryData);

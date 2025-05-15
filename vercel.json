@@ -8,10 +8,6 @@
     ],
     "routes": [
         {
-            "src": "/database/(.*)",
-            "dest": "/database/$1"
-        },
-        {
             "src": "/(.*)",
             "dest": "/"
         }

@@ -1,14 +1,14 @@
 import express from 'express';
-import { readJSON } from '../lib/file.js';
 import { slugify } from '../lib/utilities.js';
 const router = express.Router();
-const countries = readJSON('./database/countriesData.json');
-const passports = countries.map(({id, slug}) => ({id, slug, countries: []}));
+import countries from '../database/countriesData.js';
+
+const passports = countries.map(({ id, slug }) => ({ id, slug, countries: [] }));
 countries.forEach((c) => {
     c.passports.forEach((p) => {
         const slug = slugify(p.countryName);
         const passport = passports.find(p => p.slug === slug);
-        if(!passport){
+        if (!passport) {
             throw new Error(`Passport not found: ${slug}`);
         }
         passport.countries.push({
@@ -21,7 +21,7 @@ countries.forEach((c) => {
 router.get('/', (req, res) => {
     const passportList = passports.map((p) => {
         const visaRequiredCount = p.countries.reduce((acc, curr) => {
-            if(curr.isVisaRequired){
+            if (curr.isVisaRequired) {
                 acc++;
             }
             return acc;
@@ -31,7 +31,7 @@ router.get('/', (req, res) => {
             slug: p.slug,
             visaRequired: visaRequiredCount,
             totalCountries: p.countries.length + 1,
-            visaNotRequired: p.countries.length - visaRequiredCount + 1, 
+            visaNotRequired: p.countries.length - visaRequiredCount + 1,
         }
     });
     res.send(passportList.sort((a, b) => a.slug.localeCompare(b.slug)));
@@ -40,7 +40,7 @@ router.get('/', (req, res) => {
 router.get('/:passportSlug', (req, res) => {
     const { passportSlug } = req.params;
     const passportData = passports.find(p => p.slug === passportSlug);
-    if(!passportData){
+    if (!passportData) {
         return res.status(404).send({ error: 'Passport not found' });
     }
     res.send(passportData);
